@@ -11,6 +11,7 @@ gem "omniauth-github", '1.1.1'
 gem "font-awesome-rails"
 gem "d3-rails"
 gem 'gmaps4rails'
+gem "underscore-rails"
 
 group :development, :test do
   gem 'byebug'
