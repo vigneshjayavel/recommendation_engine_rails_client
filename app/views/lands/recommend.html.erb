@@ -1,0 +1,9 @@
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <%=
+  @lands = []
+  5.times { |i|
+    @lands << Land.new({id: i, name: "item#{i}"})
+  }
+  render @lands
+  %>
+</div>

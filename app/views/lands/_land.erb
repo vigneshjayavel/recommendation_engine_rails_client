@@ -1,2 +1,16 @@
-<h4>info<h4>
-<%= land.inspect %>
+<div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="heading-<%=land.id%>">
+      <h4 class="panel-title">
+        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse-<%=land.id%>" aria-expanded="false" aria-controls="collapse-<%=land.id%>">
+<%=land.name%>
+        </a>
+      </h4>
+    </div>
+    <div id="collapse-<%=land.id%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-<%=land.id%>">
+      <div class="panel-body">
+        <%=land.name%>
+      </div>
+    </div>
+  </div>
+
+  <!-- refer http://getbootstrap.com/javascript/#collapse -->

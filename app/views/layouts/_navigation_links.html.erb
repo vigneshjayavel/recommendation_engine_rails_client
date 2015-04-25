@@ -1,6 +1,5 @@
 <%# add navigation links to this file %>
 <% if user_signed_in? %>
-  <li><%= link_to 'Profile', user_path(current_user) %></li>
   <li><%= link_to 'Lands', lands_path %></li>
   <li><%= link_to 'Land Recommendation', lands_path %></li>
 <% end %>
