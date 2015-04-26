@@ -10,4 +10,15 @@ class LandsController < ApplicationController
 	def recommend
 
 	end
+
+	def get_data_from_api
+		respond_to do |format|
+			format.any {
+				http = HTTPClient.new
+				data = http.get "http://localhost:8081/recoland", "username" => "pandian"
+				render json: data.body
+			}
+		end
+		
+	end
 end
