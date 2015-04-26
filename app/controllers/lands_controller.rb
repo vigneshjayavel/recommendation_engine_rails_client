@@ -15,7 +15,7 @@ class LandsController < ApplicationController
 		respond_to do |format|
 			format.any {
 				http = HTTPClient.new
-				data = http.get "http://localhost:8081/recoland", "username" => "pandian"
+				data = http.get "http://localhost:8081/recoland", "username" => current_user.name
 				render json: data.body
 			}
 		end
