@@ -58,7 +58,7 @@ this.CustomMarker = (function(_super) {
 <div class="row">
 	<div class="col-lg-8">
 		<div style='width: 800px;'>
-		  <div id="map_holder" style=' height: 400px;'></div>
+		  <div id="map_holder" style=' height: 800px;'></div>
 		</div>
 	</div>
 	<div class="col-lg-4">
@@ -66,7 +66,6 @@ this.CustomMarker = (function(_super) {
 			<a href=# onclick=populate_locations(land_details_arr)>Resetmap</a>
 		</div>
 	</div>
-	<span id="dummy_span">clickdummy</span>
 </div>
 
 <script type="text/javascript">
@@ -80,13 +79,19 @@ $(document).ready(function(){
 		land_details_arr = []
 		score_arr = []
 		nearby_places_arr = []
+		 // var pinImage = new google.maps.MarkerImage("http://www.googlemapsmarkers.com/v1/009900/");
+
 		_.each(locations, function(recommended_land, i){
 			recommended_land.landDetails["score"] = recommended_land.score
 			recommended_land.landDetails["rank"] = i+1
 			land_details_arr.push(recommended_land.landDetails)
 			score_arr.push(recommended_land.score)
+			var hotels = recommended_land.hotelDetailsList
+			_.each(hotels, function(hotel) {
+				// hotel.icon = pinImage
+			})
 			nearby_places_arr.push({
-				"hotels": _.union(recommended_land.hotelDetailsList, {opacity: 0.5}),
+				"hotels": hotels,
 				"theaters": recommended_land.theaterDetailsList
 			})
 		})
@@ -99,16 +104,17 @@ $(document).ready(function(){
 })
 // top 5 positions are marked on map
 function createSidebarLi(json, i){
-	var s = "<li><a class=show_location><img height = 50 width=50 src=/assets/real_estate_filler.jpg />" + json.name + "</a><br><a class=show_nearby_places data-id="+i+">Show nearby places</a></li>";
+	var s = "<li>" + (i+1) +"<a class=show_location><img height = 50 width=50 src=/assets/real_estate_filler.jpg />" + json.name + "</a><br><a class=show_nearby_places data-id="+i+">hotels & theatres</a></li>";
 	return s;
 };
 
 function bindLiToMarker($li, marker){
   $li.find("a.show_location").on('click', function(){
+    // clearMarkers()
     handler.getMap().setZoom(14);
-    // marker.setMap(handler.getMap()); //because clusterer removes map property from marker
-    // marker.panTo();
-    // google.maps.event.trigger(marker.getServiceObject(), 'click');
+    marker.setMap(handler.getMap()); //because clusterer removes map property from marker
+    marker.panTo();
+    google.maps.event.trigger(marker.getServiceObject(), 'click');
   })
   $li.find("a.show_nearby_places").on('click', function(){
     // handler.getMap().setZoom(14);
@@ -121,9 +127,7 @@ function bindLiToMarker($li, marker){
 };
 
 function clearMarkers(){
-	debugger
 	for (var i = 0; i < markers.length; i++) {
-		debugger
     	markers[i].setMap(null);
   	}
 	markers = []
@@ -133,20 +137,25 @@ function createSidebar(json_array){
   _.each(json_array, function(json, i){
     var $li = $( createSidebarLi(json, i) );
     $li.appendTo('#sidebar_container');
-    // json.marker = handler.addMarker(json)
-    bindLiToMarker($li, json.marker);
+    bindLiToMarker($li, json["marker"]);
   });
 };
 
 function init_map(){
 	handler = Gmaps.build('Google', { builders: { Marker: CustomMarker} });
 	handler.buildMap({ internal: {id: 'map_holder'}}, function(){
-		clearMarkers()
-		markers = handler.addMarkers(land_details_arr)
+		// clearMarkers()
+		markers = []
+		var pinImage = new google.maps.MarkerImage("")
+		for(var i = 0; i < land_details_arr.length; i++) {
+			marker = handler.addMarker(land_details_arr[i])
+			land_details_arr[i].marker = marker
+			markers.push(marker)
+		}
 		handler.bounds.extendWith(markers);
 		handler.fitMapToBounds();
+		createSidebar(land_details_arr)
 	});
-	createSidebar(land_details_arr)
 }
 
 function populate_locations (json_array) {
@@ -167,13 +176,22 @@ function showNearbyPlaces (id) {
 	// nearby_places = location["nearby_places"]
 	var nearby_places = nearby_places_arr[id]
 	
-	clearMarkers();
+	// clearMarkers();
 	
 	// handler.buildMap({ internal: {id: 'map_holder'}}, function(){
 		var hotels_collection = nearby_places["hotels"]
 		var theaters_collection = nearby_places["theaters"]
-		markers = handler.addMarkers(hotels_collection)
-		markers.push(handler.addMarkers(theaters_collection));
+		debugger
+		hotels_markers = handler.addMarkers(hotels_collection)
+		theaters_markers = handler.addMarkers(theaters_collection)
+		_.each(theaters_markers, function(m) {
+			m.getServiceObject().setIcon("/assets/green_icon.png")
+		})
+		_.each(hotels_markers, function(m) {
+			m.getServiceObject().setIcon("/assets/yellow_icon.png")
+		})
+		markers.push(hotels_markers)
+		markers.push(theaters_markers)
 		// handler.bounds.extendWith(markers);
 		// handler.fitMapToBounds();
 
